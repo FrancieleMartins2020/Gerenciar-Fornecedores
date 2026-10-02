@@ -22,77 +22,81 @@ public class FornecedorController {
     }
 
     @GetMapping
-    public String listar(Model model) {
-
+    public String listar(Model model)
+    {
         List<Fornecedor> lista = service.listar();
         model.addAttribute("fornecedores", lista);
         return "fornecedor";
     }
 
     @GetMapping("/pesquisarFornecedor")
-    public String buscarPorCnpj(@RequestParam("cnpj") String cnpj, Model model) {
+    public String buscarPorCnpj(@RequestParam("cnpj") String cnpj, Model model)
+    {
         try {
             Fornecedor f = service.buscarPorCnpj(cnpj);
             List<Fornecedor> lista = new ArrayList<>();
-            if (f != null) {
+
+            if (f != null)
                 lista.add(f);
-            }
+
             model.addAttribute("fornecedores", lista);
         } catch (Exception e) {
             model.addAttribute("erro", "Fornecedor com CNPJ " + cnpj + " não foi encontrado.");
             model.addAttribute("fornecedores", service.listar());
         }
+        model.addAttribute("cnpjPesquisa", cnpj);
         return "fornecedor";
     }
 
     @GetMapping("/novoFornecedor")
-    public String novoFornecedorForm(Model model) {
+    public String novoFornecedorForm(Model model)
+    {
         model.addAttribute("fornecedorRequest", new FornecedorRequest());
         return "formularioFornecedor";
     }
 
     @PostMapping("/cadastrarFornecedor")
-    public String cadastrarFornecedor(@ModelAttribute("fornecedorRequest") FornecedorRequest fornecedorRequest, Model model) {
+    public String cadastrarFornecedor(@ModelAttribute("fornecedorRequest") FornecedorRequest fornecedorRequest, Model model)
+    {
         try {
             service.salvar(fornecedorRequest);
             return "redirect:/fornecedor";
         } catch (IllegalArgumentException e) {
             model.addAttribute("erro", e.getMessage());
-
+            model.addAttribute("fornecedorRequest", fornecedorRequest);
             return "formularioFornecedor";
         } catch (Exception e) {
             model.addAttribute("erro", "Ocorreu um erro inesperado ao salvar.");
+            model.addAttribute("fornecedorRequest", fornecedorRequest);
             return "formularioFornecedor";
         }
     }
 
-    // =========================================================================
-    // NOVOS MÉTODOS DE EDIÇÃO ATUALIZADOS COM BASE NO ID DO REQUEST
-    // =========================================================================
-
     @GetMapping("/editarFornecedor")
     public String editarFornecedorForm(@RequestParam("id") Long id, Model model) {
         try {
-            // Busca o DTO pronto e mapeado pelo Service
             FornecedorRequest request = service.buscarParaEdicao(id);
             model.addAttribute("fornecedorRequest", request);
-            return "editarFormularioFornecedor"; // Abre a tela de edição
+            return "editarFormularioFornecedor";
         } catch (Exception e) {
             return "redirect:/fornecedor";
         }
     }
 
     @PostMapping("/editarCadastroFornecedor")
-    public String editar(@ModelAttribute("fornecedorRequest") FornecedorRequest fornecedorRequest, Model model) {
+    public String editar(@ModelAttribute("fornecedorRequest") FornecedorRequest fornecedorRequest, Model model)
+    {
         try {
-            // O próprio objeto fornecedorRequest carrega seu ID de forma oculta da tela
             service.atualizar(fornecedorRequest);
             return "redirect:/fornecedor";
         } catch (IllegalArgumentException e) {
-            model.addAttribute("erro", e.getMessage());
+            model.addAttribute("erro",  e.getMessage());
+            model.addAttribute("fornecedorRequest", fornecedorRequest);
             return "editarFormularioFornecedor";
+
         } catch (Exception e) {
             model.addAttribute("erro", "Erro ao atualizar: " + e.getMessage());
+            model.addAttribute("fornecedorRequest", fornecedorRequest);
             return "editarFormularioFornecedor";
         }
     }
@@ -103,12 +107,9 @@ public class FornecedorController {
             service.excluir(id);
             return "redirect:/fornecedor";
         } catch (IllegalArgumentException e) {
-            // Se cair aqui, significa que o fornecedor possui contratos e o bloqueio funcionou!
             model.addAttribute("erro", e.getMessage());
-
-            model.addAttribute("fornecedores", service.listar()); // Recarrega a tabela de fornecedores
-            return "fornecedor"; // Devolve o usuário para a página de listagem exibindo o erro
+            model.addAttribute("fornecedores",service.listar());
+            return "fornecedor";
         }
     }
-
 }

@@ -39,7 +39,6 @@ public class ContratoController {
             service.salvar(request);
             return "redirect:/contrato";
         } catch (Exception e) {
-            // CORREÇÃO: Mantém a mensagem do service e passa de volta o DTO 'request' preenchido
             model.addAttribute("erro", e.getMessage());
             model.addAttribute("contratoRequest", request);
             model.addAttribute("fornecedores", fornecedorService.listar());
@@ -65,7 +64,6 @@ public class ContratoController {
             service.atualizar(request);
             return "redirect:/contrato";
         } catch (Exception e) {
-            // CORREÇÃO: Mantém a mensagem do service e passa de volta o DTO 'request' com o ID oculto e os dados digitados
             model.addAttribute("erro", e.getMessage());
             model.addAttribute("contratoRequest", request);
             model.addAttribute("fornecedores", fornecedorService.listar());

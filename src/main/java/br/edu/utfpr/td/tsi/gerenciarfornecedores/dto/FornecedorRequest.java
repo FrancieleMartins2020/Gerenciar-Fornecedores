@@ -4,7 +4,9 @@ import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 
 public class FornecedorRequest {
+
     private Long id;
+
     @NotBlank
     private String razaoSocial;
 
@@ -19,6 +21,14 @@ public class FornecedorRequest {
     private String telefone;
 
     private String endereco;
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
 
     public String getRazaoSocial() {
         return razaoSocial;
@@ -67,13 +77,4 @@ public class FornecedorRequest {
     public void setEndereco(String endereco) {
         this.endereco = endereco;
     }
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
 }
-

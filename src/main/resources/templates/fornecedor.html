@@ -5,82 +5,112 @@
     <title>Gerenciar fornecedores Web</title>
 </head>
 <body>
-<h1>Listar Fornecedores</h1>
+    <h1>Listar Fornecedores</h1>
+    <form method="GET" th:action="@{/fornecedor/pesquisarFornecedor}">
+        <label for="cnpj">Digite o CNPJ:</label><br>
+        <input type="text" id="cnpj" name="cnpj" th:value="${cnpjPesquisa}" maxlength="18" placeholder="00.000.000/0000-00"><br>
 
-<form method="GET" th:action="@{/fornecedor/pesquisarFornecedor}">
+        <button type="submit"> Pesquisar </button>
+        <a th:href="@{/fornecedor}"> <button type="button"> Limpar </button> </a>
+        <br><br>
+    </form>
 
-    <label>Digite o CNPJ:</label><br>
-    <input type="text" id="cnpj" name="cnpj" th:value="${param.cnpj}" maxlength="18" placeholder="00.000.000/0000-00" /><br>
-
-    <button type="submit">Pesquisar</button>
-    <a th:href="@{/fornecedor}">
-        <button type="button">Limpar</button>
-    </a>
+    <form method="GET" th:action="@{/fornecedor/novoFornecedor}">
+        <button type="submit">Novo fornecedor</button>
+    </form>
     <br><br>
-
-</form>
-
-<form method="GET" th:action="@{/fornecedor/novoFornecedor}">
-    <button type="submit">Novo fornecedor</button>
-</form>
-<br><br>
-<table border="1">
-    <thead>
-    <tr>
-        <th>ID</th>
-        <th>Razão Social</th>
-        <th>Nome Fantasia</th>
-        <th>CNPJ</th>
-        <th>E-mail</th>
-        <th>Telefone</th>
-        <th>Endereço</th>
-        <th>Remover</th>
-        <th>Editar</th>
-    </tr>
-    </thead>
-    <tbody>
-    <tr th:each="doc : ${fornecedores}">
-        <td th:text="${doc.id}"></td>
-        <td th:text="${doc.razaoSocial}"></td>
-        <td th:text="${doc.nomeFantasia}"></td>
-        <td th:text="${doc.cnpj}"></td>
-        <td th:text="${doc.email}"></td>
-        <td th:text="${doc.telefone}"></td>
-        <td th:text="${doc.endereco}"></td>
-
-        <td>
-            <a th:href="@{/fornecedor/removerFornecedor(id=${doc.id})}"
-               th:data-nome="${doc.razaoSocial}"
-               onclick="return confirm('Deseja realmente excluir o fornecedor: ' + this.getAttribute('data-nome') + '?');">
-                Remover
-            </a>
-        </td>
-
-        <td><a th:href="@{/fornecedor/editarFornecedor(id=${doc.id})}">Editar</a></td>
-    </tr>
-    </tbody>
-</table>
-<br>
-<p style="color:red; font-weight: bold;" th:if="${erro}" th:text="${erro}"></p>
-<a th:href="@{/}"> Voltar </a>
+    <table border="1">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Razão Social</th>
+                <th>Nome Fantasia</th>
+                <th>CNPJ</th>
+                <th>E-mail</th>
+                <th>Telefone</th>
+                <th>Endereço</th>
+                <th>Remover</th>
+                <th>Editar</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr th:each="doc : ${fornecedores}">
+                <td th:text="${doc.id}"></td>
+                <td th:text="${doc.razaoSocial}"></td>
+                <td th:text="${doc.nomeFantasia}"></td>
+                <td class="cnpj" th:text="${doc.cnpj}"></td>
+                <td th:text="${doc.email}"></td>
+                <td class="telefone" th:attr="data-ddd=${doc.ddd},data-telefone=${doc.telefone}"></td>
+                <td th:text="${doc.endereco}"></td>
+                <td>
+                    <a th:href="@{/fornecedor/removerFornecedor(id=${doc.id})}"
+                       th:data-nome="${doc.razaoSocial}"
+                       onclick="return confirm('Deseja realmente excluir o fornecedor: ' + this.getAttribute('data-nome') + '?');">
+                        Remover
+                    </a>
+                </td>
+                <td>
+                    <a th:href="@{/fornecedor/editarFornecedor(id=${doc.id})}">Editar</a>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+    <br>
+    <p style="color:red; font-weight:bold;" th:if="${erro}" th:text="${erro}"></p>
+    <a th:href="@{/}">Voltar</a>
 </body>
-
 <script>
+    function formatarCnpj(valor) {
+        if (!valor)
+            return '';
+
+        valor = valor.replace(/\D/g, '');
+        if (valor.length !== 14)
+            return valor;
+
+        return valor.replace(/^(\d{2})(\d{3})(\d{3})(\d{4})(\d{2})$/, '$1.$2.$3/$4-$5');
+    }
+
+    function formatarTelefone(ddd, telefone) {
+
+        if (!ddd || !telefone)
+            return '';
+
+        ddd = ddd.replace(/\D/g, '');
+        telefone = telefone.replace(/\D/g, '');
+
+        if (telefone.length === 8)
+            return '(' + ddd + ') ' + telefone.substring(0, 4) + '-' + telefone.substring(4);
+
+        if (telefone.length === 9)
+            return '(' + ddd + ') ' + telefone.substring(0, 5) + '-' + telefone.substring(5);
+
+        return '(' + ddd + ') ' + telefone;
+    }
+
+    document.querySelectorAll('.cnpj').forEach(elemento => {elemento.textContent = formatarCnpj(elemento.textContent);});
+
+    document.querySelectorAll('.telefone').forEach(elemento => {
+            const ddd = elemento.getAttribute('data-ddd');
+            const telefone = elemento.getAttribute('data-telefone');
+            elemento.textContent = formatarTelefone(ddd, telefone);
+        });
+
     const inputCnpj = document.getElementById('cnpj');
 
-    inputCnpj.addEventListener('input', (e) => {
-        let valor = e.target.value.replace(/\D/g, '');
+    if (inputCnpj) {
+        inputCnpj.addEventListener('input', (e) => {
+            let valor = e.target.value.replace(/\D/g, '');
+            if (valor.length > 14)
+                valor = valor.slice(0, 14);
 
-        if (valor.length > 14) {
-            valor = valor.slice(0, 14);
-        }
+            valor = valor.replace(/^(\d{2})(\d)/, '$1.$2');
+            valor = valor.replace(/^(\d{2})\.(\d{3})(\d)/, '$1.$2.$3');
+            valor = valor.replace(/\.(\d{3})(\d)/, '.$1/$2');
+            valor = valor.replace(/(\d{4})(\d{1,2})$/, '$1-$2');
 
-        valor = valor.replace(/^(\d{2})(\d)/, '$1.$2');
-        valor = valor.replace(/^(\d{2})\.(\d{3})(\d)/, '$1.$2.$3');
-        valor = valor.replace(/\.(\d{3})(\d)/, '.$1/$2');
-        valor = valor.replace(/(\d{4})(\d{1,2})$/, '$1-$2');
-
-        e.target.value = valor;
-    });
+            e.target.value = valor;
+        });
+    }
 </script>
 </html>

@@ -19,11 +19,15 @@ public class Fornecedor {
 
     private String nomeFantasia;
 
-    @Column(nullable = false, unique = true)
+    @Column(nullable = false, unique = true, length = 14)
     private String cnpj;
 
     private String email;
 
+    @Column(length = 2)
+    private String ddd;
+
+    @Column(length = 9)
     private String telefone;
 
     private String endereco;
@@ -77,6 +81,14 @@ public class Fornecedor {
 
     public void setEmail(String email) {
         this.email = email;
+    }
+
+    public String getDdd() {
+        return ddd;
+    }
+
+    public void setDdd(String ddd) {
+        this.ddd = ddd;
     }
 
     public String getTelefone() {

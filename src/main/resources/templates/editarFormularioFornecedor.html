@@ -1,84 +1,106 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
-	<meta charset="UTF-8">
-	<title>Gerenciar fornecedores Web</title>
+    <meta charset="UTF-8">
+    <title>Gerenciar fornecedores Web</title>
 </head>
 <body>
-<h1>Editar Cadastro Fornecedor</h1>
+    <h1>Editar Cadastro Fornecedor</h1>
+    <form id="formFornecedor" method="POST" th:action="@{/fornecedor/editarCadastroFornecedor}"
+          th:object="${fornecedorRequest}">
+        <input type="hidden" th:field="*{id}">
 
-<form method="POST" th:action="@{/fornecedor/editarCadastroFornecedor}" th:object="${fornecedorRequest}">
+        <label for="razaoSocial"> Razão Social: </label><br>
+        <input type="text" id="razaoSocial" th:field="*{razaoSocial}" placeholder="razão social"> <br><br>
 
-	<input type="hidden" th:field="*{id}" />
+        <label for="nomeFantasia"> Nome Fantasia: </label> <br>
+        <input type="text" id="nomeFantasia" th:field="*{nomeFantasia}" placeholder="nome fantasia"> <br><br>
 
-	<label>Razão Social: </label><br>
-	<input type="text" th:field="*{razaoSocial}" placeholder="razão social"><br><br>
+        <label for="cnpj"> CNPJ: </label> <br>
+        <input type="text" id="cnpj" th:field="*{cnpj}" maxlength="18" placeholder="00.000.000/0000-00"> <br><br>
 
-	<label>Nome Fantasia: </label><br>
-	<input type="text" th:field="*{nomeFantasia}" placeholder="nome fantasia"><br><br>
+        <label for="email"> E-mail: </label> <br>
+        <input type="text" id="email" th:field="*{email}" placeholder="seu.nome@email.com"> <br><br>
 
-	<label>CNPJ: </label><br>
-	<input type="text" th:field="*{cnpj}" maxlength="18" placeholder="00.000.000/0000-00" /><br><br>
+        <label for="telefone"> Telefone: </label> <br>
+        <input type="text" id="telefone" th:field="*{telefone}" maxlength="15" placeholder="(00) 00000-0000"> <br><br>
 
-	<label>E-mail: </label><br>
-	<input type="email" th:field="*{email}" placeholder="seu.nome@email.com" /><br><br>
+        <label for="endereco"> Endereço: </label> <br>
+        <input type="text" id="endereco" th:field="*{endereco}" placeholder="endereço"> <br><br>
 
-	<label>Telefone: </label><br>
-	<input type="text" th:field="*{telefone}" maxlength="15" placeholder="(00) 00000-0000"><br><br>
+        <p id="msgErro" style="color:red" th:if="${erro}" th:text="${erro}"> </p>
+        <input type="submit" value="Salvar Alterações">
+        <input type="button" id="btnLimpar" value="Limpar">
 
-	<label>Endereço: </label><br>
-	<input type="text" th:field="*{endereco}" placeholder="endereço"><br><br>
-
-	<p style="color:red" th:if="${erro}" th:text="${erro}"></p>
-
-	<input type="submit" value="Salvar Alterações" />
-</form>
-<br>
-<a th:href="@{/fornecedor}"> Voltar </a>
+    </form>
+    <br>
+    <a th:href="@{/fornecedor}"> Voltar </a>
 </body>
-
 <script>
-	const inputCnpj = document.getElementById('cnpj');
-	const inputTelefone = document.getElementById('telefone');
-	const inputEmail = document.getElementById('email');
+    const formFornecedor = document.getElementById('formFornecedor');
+    const btnLimpar = document.getElementById('btnLimpar');
+    const msgErro = document.getElementById('msgErro');
+    const inputCnpj = document.getElementById('cnpj');
+    const inputTelefone = document.getElementById('telefone');
+    const inputEmail = document.getElementById('email');
 
-	inputCnpj.addEventListener('input', (e) => {
-		let valor = e.target.value.replace(/\D/g, ''); // Remove tudo que não for número
+    function formatarCnpj(valor) {
+        valor = valor.replace(/\D/g, '');
+        if (valor.length > 14)
+            valor = valor.slice(0, 14);
 
-		if (valor.length > 14) {
-			valor = valor.slice(0, 14);
-		}
+        valor = valor.replace(/^(\d{2})(\d)/, '$1.$2');
+        valor = valor.replace(/^(\d{2})\.(\d{3})(\d)/, '$1.$2.$3');
+        valor = valor.replace(/\.(\d{3})(\d)/, '.$1/$2');
+        valor = valor.replace(/(\d{4})(\d{1,2})$/, '$1-$2');
+        return valor;
+    }
 
-		valor = valor.replace(/^(\d{2})(\d)/, '$1.$2');
-		valor = valor.replace(/^(\d{2})\.(\d{3})(\d)/, '$1.$2.$3');
-		valor = valor.replace(/\.(\d{3})(\d)/, '.$1/$2');
-		valor = valor.replace(/(\d{4})(\d{1,2})$/, '$1-$2');
+    inputCnpj.addEventListener('input', (e) => {
+        e.target.value = formatarCnpj(e.target.value);
+    });
 
-		e.target.value = valor;
-	});
-	inputTelefone.addEventListener('input', (e) => {
-		let valor = e.target.value.replace(/\D/g, ''); // Remove o que não for número
+    function formatarTelefone(valor) {
+        valor = valor.replace(/\D/g, '');
+        if (valor.length > 11) {
+            valor = valor.slice(0, 11);
+        }
 
-		if (valor.length > 11) {
-			valor = valor.slice(0, 11); // Limita a 11 dígitos
-		}
+        if (valor.length > 10) {
+            valor = valor.replace(/^(\d{2})(\d{5})(\d{1,4})$/, '($1) $2-$3');
+        } else if (valor.length > 6) {
+            valor = valor.replace(/^(\d{2})(\d{4})(\d{1,4})$/, '($1) $2-$3');
+        } else if (valor.length > 2) {
+            valor = valor.replace(/^(\d{2})(\d+)/, '($1) $2');
+        }
 
-		valor = valor.replace(/^(\d{2})(\d)/g, '($1) $2');
+        return valor;
+    }
 
-		if (valor.length <= 13) {
-			valor = valor.replace(/(\d{4})(\d)/, '$1-$2');
-		} else {
-			valor = valor.replace(/(\d{5})(\d)/, '$1-$2');
-		}
+    inputTelefone.addEventListener('input', (e) => {
+        e.target.value =  formatarTelefone(e.target.value);
+    });
 
-		e.target.value = valor;
-	});
-	inputEmail.addEventListener('input', (e) => {
-		let valor = e.target.value;
+    inputEmail.addEventListener('input', (e) => {
+        e.target.value = e.target.value.toLowerCase().replace(/\s/g, '');
+    });
 
-		valor = valor.toLowerCase().replace(/\s/g, '');
+    btnLimpar.addEventListener('click', () => {
+        formFornecedor.querySelectorAll('input[type="text"]')
+            .forEach(input => {
+                input.value = '';
+            });
 
-		e.target.value = valor;
-	});
+        if (msgErro)
+            msgErro.style.display = 'none';
+
+    });
+
+    if (inputCnpj.value)
+        inputCnpj.value = formatarCnpj(inputCnpj.value);
+
+    if (inputTelefone.value)
+        inputTelefone.value = formatarTelefone(inputTelefone.value);
+
 </script>
 </html>
