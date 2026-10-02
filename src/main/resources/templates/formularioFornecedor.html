@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+	<meta charset="UTF-8">
+	<title>Gerenciar fornecedores Web</title>
+</head>
+<body>
+<h1>Cadastrar Novo Fornecedor</h1>
+
+<form id="formFornecedor" method="POST" th:action="@{/fornecedor/cadastrarFornecedor}" th:object="${fornecedorRequest}">
+	<label>Razão Social: </label><br>
+	<input type="text" th:field="*{razaoSocial}" placeholder="razão social"><br><br>
+
+	<label>Nome Fantasia: </label><br>
+	<input type="text" th:field="*{nomeFantasia}" placeholder="nome fantasia"><br><br>
+
+	<label for="cnpj">CNPJ:</label><br>
+	<input type="text" id="cnpj" th:field="*{cnpj}" maxlength="18" placeholder="00.000.000/0000-00" /><br><br>
+
+	<label for="email">E-mail:</label><br>
+	<input type="text" id="email" th:field="*{email}" placeholder="seu.nome@email.com" /><br><br>
+
+	<label for="telefone">Telefone:</label><br>
+	<input type="text" id="telefone" th:field="*{telefone}" maxlength="15" placeholder="(00) 00000-0000" /><br><br>
+
+	<label>Endereço: </label><br>
+	<input type="text" th:field="*{endereco}" placeholder="endereço"><br><br>
+
+	<p id="msgErro" style="color:red" th:if="${erro}" th:text="${erro}"></p>
+
+	<input type="submit" value="Salvar" />
+
+	<input type="button" id="btnLimpar" value="Limpar Cadastro" />
+</form>
+<br>
+<a th:href="@{/fornecedor}"> Voltar </a>
+
+</body>
+
+<script>
+	const formFornecedor = document.getElementById('formFornecedor');
+	const btnLimpar = document.getElementById('btnLimpar');
+	const msgErro = document.getElementById('msgErro');
+	const inputCnpj = document.getElementById('cnpj');
+	const inputTelefone = document.getElementById('telefone');
+	const inputEmail = document.getElementById('email');
+
+	inputCnpj.addEventListener('input', (e) => {
+		let valor = e.target.value.replace(/\D/g, ''); // Remove tudo que não for número
+
+		if (valor.length > 14) {
+			valor = valor.slice(0, 14);
+		}
+
+		valor = valor.replace(/^(\d{2})(\d)/, '$1.$2');
+		valor = valor.replace(/^(\d{2})\.(\d{3})(\d)/, '$1.$2.$3');
+		valor = valor.replace(/\.(\d{3})(\d)/, '.$1/$2');
+		valor = valor.replace(/(\d{4})(\d{1,2})$/, '$1-$2');
+
+		e.target.value = valor;
+	});
+	inputTelefone.addEventListener('input', (e) => {
+		let valor = e.target.value.replace(/\D/g, ''); // Remove o que não for número
+
+		if (valor.length > 11) {
+			valor = valor.slice(0, 11);
+		}
+
+		valor = valor.replace(/^(\d{2})(\d)/g, '($1) $2');
+
+		if (valor.length <= 13) {
+			valor = valor.replace(/(\d{4})(\d)/, '$1-$2');
+		} else {
+			valor = valor.replace(/(\d{5})(\d)/, '$1-$2');
+		}
+
+		e.target.value = valor;
+	});
+	inputEmail.addEventListener('input', (e) => {
+		let valor = e.target.value;
+
+		valor = valor.toLowerCase().replace(/\s/g, '');
+
+		e.target.value = valor;
+	});
+
+	btnLimpar.addEventListener('click', () => {
+		formFornecedor.querySelectorAll('input[type="text"]').forEach(input => {
+			input.value = '';
+		});
+
+		if (msgErro) {
+			msgErro.style.display = 'none';
+		}
+	});
+</script>
+</html>

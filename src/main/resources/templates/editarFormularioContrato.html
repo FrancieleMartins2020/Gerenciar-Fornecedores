@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html xmlns:th="http://thymeleaf.org">
+<head>
+	<meta charset="UTF-8">
+	<title>Gerenciar fornecedores Web</title>
+</head>
+<body>
+<h1>Editar Cadastro Contrato</h1>
+
+<form id="formContrato" method="POST" th:action="@{/contrato/editarCadastroContrato}" th:object="${contratoRequest}" novalidate>
+
+	<input type="hidden" th:field="*{id}" />
+
+	<label>Fornecedor:</label><br>
+	<select th:field="*{fornecedorId}" required>
+		<option value="">Selecione</option>
+		<option th:each="f : ${fornecedores}"
+				th:value="${f.id}"
+				th:text="${f.razaoSocial}">
+		</option>
+	</select><br><br>
+
+	<label>Produto / Serviço:</label><br>
+	<input type="text" th:field="*{produtoServico}"><br><br>
+
+	<label>Valor (R$):</label><br>
+	<input type="text" id="valor" th:field="*{valor}" placeholder="0,00" autocomplete="off"><br><br>
+
+	<label>Data de Início:</label><br>
+	<input type="date" th:field="*{dataInicio}"><br><br>
+
+	<label>Data de Fim:</label><br>
+	<input type="date" th:field="*{dataFim}"><br><br>
+
+	<label>Descrição:</label><br>
+	<textarea th:field="*{descricao}" rows="4" cols="50"></textarea><br><br>
+
+	<p style="color:red" th:if="${erro}" th:text="${erro}"></p>
+
+	<input type="submit" value="Salvar" />
+</form>
+<br>
+<a th:href="@{/contrato}"> Voltar </a>
+</body>
+
+<script>
+	const inputValor = document.getElementById('valor');
+
+	function aplicarMascara(rawText) {
+		if (!rawText) return "";
+		let texto = rawText.toString().trim();
+
+		if (texto.includes(',')) {
+			texto = texto.replace(/\./g, '').replace(',', '');
+		} else if (texto.includes('.') && !texto.includes(',')) {
+			texto = parseFloat(texto).toFixed(2).replace('.', '');
+		}
+
+		let digits = texto.replace(/\D/g, '');
+		if (!digits) return "";
+
+		let numero = parseFloat(digits) / 100;
+		return new Intl.NumberFormat('pt-BR', {
+			minimumFractionDigits: 2,
+			maximumFractionDigits: 2
+		}).format(numero);
+	}
+
+	if (inputValor.value) {
+		inputValor.value = aplicarMascara(inputValor.value);
+	}
+
+	inputValor.addEventListener('input', (e) => {
+		let cursorPosition = e.target.selectionStart;
+		let oldLength = e.target.value.length;
+
+		e.target.value = aplicarMascara(e.target.value);
+
+		let newLength = e.target.value.length;
+		cursorPosition = cursorPosition + (newLength - oldLength);
+		e.target.setSelectionRange(cursorPosition, cursorPosition);
+	});
+</script>
+</html>

@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Gerenciar fornecedores Web</title>
+</head>
+<body>
+<h1>Listar Contratos</h1>
+    <form method="GET" action="/contrato/novoContrato">
+        <button type="submit">Novo contrato</button>
+    </form>
+
+    <br><br>
+
+    <table border="1">
+        <tr>
+            <th>ID</th>
+            <th>Fornecedor</th>
+            <th>Produto / Serviço</th>
+            <th>Valor</th>
+            <th>Data de Início</th>
+            <th>Data de Fim</th>
+            <th>Descrição</th>
+            <th>Remover</th>
+            <th>Editar</th>
+        </tr>
+
+        <tr th:each="c : ${contratos}">
+            <td th:text="${c.id}"></td>
+            <td th:text="${c.fornecedor != null ? c.fornecedor.razaoSocial : 'Não informado'}"></td>
+            <td th:text="${c.produtoServico}"></td>
+            <td>R$ <span th:text="${#numbers.formatDecimal(c.valor, 1, 'POINT', 2, 'COMMA')}"></span></td>
+            <td th:text="${c.dataInicio}"></td>
+            <td th:text="${c.dataFim}"></td>
+            <td th:text="${c.descricao}"></td>
+            <td><a th:href="@{/contrato/removerContrato(id=${c.id})}">Remover</a></td>
+            <td><a th:href="@{/contrato/editarContrato(id=${c.id})}">Editar</a></td>
+        </tr>
+    </table>
+
+    <br>
+    <p style="color:red; font-weight: bold;" th:if="${erro}" th:text="${erro}"></p>
+
+    <br>
+    <a th:href="@{/}"> Voltar</a>
+</body>
+</html>

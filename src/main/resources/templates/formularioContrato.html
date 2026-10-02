@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html xmlns:th="http://thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Gerenciar fornecedores Web</title>
+</head>
+<body>
+<h1>Cadastrar Novo Contrato</h1>
+<form id="formContrato" method="POST" th:action="@{/contrato/cadastrarContrato}" th:object="${contratoRequest}" novalidate>
+    <label>Fornecedor:</label><br>
+    <select th:field="*{fornecedorId}">
+        <option value="">Selecione</option>
+        <option th:each="f : ${fornecedores}" th:value="${f.id}" th:text="${f.razaoSocial}">
+        </option>
+    </select>
+    <br><br>
+
+    <label>Produto / Serviço:</label><br>
+    <input type="text" th:field="*{produtoServico}" placeholder="produto / serviço"><br><br>
+
+    <label>Valor (R$):</label><br>
+    <input type="text" id="valor" th:field="*{valor}" placeholder="0,00" autocomplete="off"><br><br>
+
+    <label>Data de Início:</label><br>
+    <input type="date" th:field="*{dataInicio}" placeholder="data de início"><br><br>
+
+    <label>Data de Fim:</label><br>
+    <input type="date" th:field="*{dataFim}" placeholder="data de fim"><br><br>
+
+    <label>Descrição:</label><br>
+    <textarea th:field="*{descricao}" rows="4" cols="50" placeholder="descrição"></textarea><br><br>
+
+    <p id="msgErro" style="color:red; font-weight: bold;" th:if="${erro}" th:text="${erro}"></p>
+
+    <input type="submit" value="Salvar" />
+    <!-- Alterado para type="button" para evitar o comportamento indesejado do reset nativo -->
+    <input type="button" id="btnLimpar" value="Limpar Cadastro" />
+</form>
+<br>
+<a th:href="@{/contrato}"> Voltar </a>
+</body>
+<script>
+    const formContrato = document.getElementById('formContrato');
+    const inputValor = document.getElementById('valor');
+    const btnLimpar = document.getElementById('btnLimpar');
+    const msgErro = document.getElementById('msgErro');
+
+    function aplicarMascara(rawText) {
+        if (!rawText) return "";
+        let texto = rawText.toString().trim();
+        if (texto.includes(',')) {
+            texto = texto.replace(/\./g, '').replace(',', '');
+        } else if (texto.includes('.') && !texto.includes(',')) {
+            texto = parseFloat(texto).toFixed(2).replace('.', '');
+        }
+        let digits = texto.replace(/\D/g, '');
+        if (!digits) return "";
+        let numero = parseFloat(digits) / 100;
+        return new Intl.NumberFormat('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(numero);
+    }
+
+    if (inputValor.value) {
+        inputValor.value = aplicarMascara(inputValor.value);
+    }
+
+    inputValor.addEventListener('input', (e) => {
+        let cursorPosition = e.target.selectionStart;
+        let oldLength = e.target.value.length;
+        e.target.value = aplicarMascara(e.target.value);
+        let newLength = e.target.value.length;
+        cursorPosition = cursorPosition + (newLength - oldLength);
+        e.target.setSelectionRange(cursorPosition, cursorPosition);
+    });
+
+    btnLimpar.addEventListener('click', () => {
+        formContrato.querySelectorAll('input[type="text"], input[type="date"]').forEach(input => {
+            input.value = '';
+        });
+
+        formContrato.querySelectorAll('textarea').forEach(textarea => {
+            textarea.value = '';
+        });
+
+        formContrato.querySelectorAll('select').forEach(select => {
+            select.selectedIndex = 0;
+        });
+
+        if (msgErro) {
+            msgErro.style.display = 'none';
+        }
+    });
+</script>
+</html>
