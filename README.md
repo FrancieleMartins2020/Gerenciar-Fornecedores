@@ -89,7 +89,9 @@ A aplicação utiliza uma organização em camadas, combinando o padrão MVC com
 - **DTO:** representa os dados recebidos dos formulários.
 - **View:** apresenta os dados por meio dos templates Thymeleaf.
 
-📷 **Imagem recomendada:** `docs/images/arquitetura.png`
+![Arquitetura](docs/images/arquitetura.png)
+
+**Arquivo:** `docs/images/arquitetura.png`
 
 Uma imagem da arquitetura facilita a explicação do fluxo de uma requisição durante a apresentação oral.
 
