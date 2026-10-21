@@ -42,7 +42,6 @@ O projeto também permite estudar conceitos fundamentais de desenvolvimento Web 
 | Maven | Gerenciamento de dependências e build |
 | Banco de dados relacional | Persistência de fornecedores e contratos |
 
-**Observação:** confirme a versão do Java e o banco de dados efetivamente configurados no projeto antes de publicar esta seção como documentação definitiva.
 
 ## 🏗️ Arquitetura da aplicação
 
